@@ -708,7 +708,7 @@ def render_us(
         ax.set_zlim(mid_z - max_range, mid_z + max_range)
         
         plt.tight_layout()
-        plt.savefig('figures/debug_rays_3d.png', dpi=150, bbox_inches='tight')
+        plt.savefig('docs/debug_rays_3d.png', dpi=150, bbox_inches='tight')
         plt.close()
         
         # Now create 2D projections for all axis permutations
@@ -778,12 +778,12 @@ def render_us(
             ax_points.set_aspect('equal', adjustable='box')
         
         plt.tight_layout()
-        plt.savefig('figures/debug_rays_2d_projections.png', dpi=150, bbox_inches='tight')
+        plt.savefig('docs/debug_rays_2d_projections.png', dpi=150, bbox_inches='tight')
         plt.close()
         
         print(f"Debug ray visualizations saved:")
-        print(f"  - figures/debug_rays_3d.png (3D view)")
-        print(f"  - figures/debug_rays_2d_projections.png (XY, XZ, YZ projections)")
+        print(f"  - docs/debug_rays_3d.png (3D view)")
+        print(f"  - docs/debug_rays_2d_projections.png (XY, XZ, YZ projections)")
         print(f"  Total rays: {rays_o.shape[0]}")
         print(f"  Visualized: {n_rays_to_plot}")
         print(f"  Near distance: {near_np[0,0]:.6f}")

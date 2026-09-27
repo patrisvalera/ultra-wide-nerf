@@ -320,7 +320,7 @@ def config_parser():
                         help="with --convex_use_compiled_cache: fill the cache as images are first used instead of precomputing it")
     
     parser.add_argument('--debug_viz_render', action='store_true',
-                        help='save 3D plots of poses and rays on the first render call (figures/debug_rays_*.png and basedir)')
+                        help='save 3D plots of poses and rays on the first render call (docs/debug_rays_*.png and basedir)')
     parser.add_argument('--convex_save_meta_files', default=False, action='store_true',
                         help="create a meta/ folder in basedir (nothing is written to it currently)")
     parser.add_argument('--full_volume_mode', default=False, action='store_true',

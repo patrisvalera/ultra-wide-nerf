@@ -7,7 +7,7 @@
   <meta name="description" content="Ultra-Wide-NeRF reconstructs wide field-of-view 3D ultrasound from overlapping convex-probe sweeps with cone tracing and anisotropic multivariate Gaussians. ASMUS Workshop, MICCAI 2026.">
   <meta property="og:title" content="Ultra-Wide-NeRF">
   <meta property="og:description" content="Multivariate Gaussian NeRF for Wide Field-of-View Ultrasound Reconstruction. ASMUS Workshop, MICCAI 2026.">
-  <meta property="og:image" content="https://patrisvalera.github.io/ultra-wide-nerf/overview_thesis_method.png">
+  <meta property="og:image" content="https://patrisvalera.github.io/ultra-wide-nerf/ultra-wide-nerf_method.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫀</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     function ph(img) {
       var box = document.createElement('div');
       box.className = 'ph';
-      box.innerHTML = 'Add <code>' + img.getAttribute('src') + '</code> to the figures folder';
+      box.innerHTML = 'Add <code>' + img.getAttribute('src') + '</code> to the docs folder';
       img.replaceWith(box);
     }
     function phSlider(img) {
@@ -27,7 +27,7 @@
         var files = Array.prototype.map.call(s.querySelectorAll('img'), function (i) {
           return '<code>' + i.getAttribute('src') + '</code>';
         }).join(' and ');
-        s.innerHTML = '<div class="ph">Add ' + files + ' to the figures folder (same view, same size)</div>';
+        s.innerHTML = '<div class="ph">Add ' + files + ' to the docs folder (same view, same size)</div>';
       }
     }
   </script>
@@ -308,7 +308,7 @@
 <section class="teaser-section">
   <div class="wrap">
     <figure class="teaser">
-      <a class="zoom" href="overview_thesis_method.png" target="_blank" rel="noopener"><img src="overview_thesis_method.png" alt="Overview of Ultra-Wide-NeRF: overlapping convex-probe sweeps are fused into one continuous neural field and rendered along arbitrary trajectories." onerror="ph(this)"></a>
+      <a class="zoom" href="ultra-wide-nerf_method.png" target="_blank" rel="noopener"><img src="ultra-wide-nerf_method.png" alt="Overview of Ultra-Wide-NeRF: overlapping convex-probe sweeps are fused into one continuous neural field and rendered along arbitrary trajectories." onerror="ph(this)"></a>
       <figcaption><b>Ultra-Wide-NeRF</b> fuses overlapping sweeps of a convex probe into one continuous neural field of the tissue, which we render along arbitrary virtual trajectories for panoramic reconstruction and novel view synthesis.</figcaption>
     </figure>
   </div>

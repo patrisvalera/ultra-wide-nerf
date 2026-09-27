@@ -14,7 +14,7 @@ logs/
 events.out.tfevents.*
 
 # Debug visualizations written by --debug_viz_render
-figures/debug_*
+docs/debug_*
 
 # Python
 __pycache__/

@@ -16,7 +16,7 @@
 </div>
 
 <p align="center">
-  <img src="figures/overview_thesis_method.png" width="100%">
+  <img src="docs/ultra-wide-nerf_method.png" width="100%">
 </p>
 
 Ultra-Wide-NeRF reconstructs wide field-of-view (WFoV) 3D ultrasound from overlapping sweeps of a convex probe. Stitching such sweeps together usually introduces compounding artifacts and aliasing, because the diverging beam changes resolution with depth. Ultra-Wide-NeRF models this beam geometry explicitly: it casts cones through a convex fan and approximates each cone segment by an anisotropic multivariate 3D Gaussian. The result is a continuous neural representation of the tissue that can be rendered from arbitrary virtual trajectories, for panoramic reconstruction and novel view synthesis. In the paper, the method is validated for intracardiac echocardiography (ICE) on phantom and porcine data.
@@ -41,13 +41,13 @@ Ultra-Wide-NeRF reconstructs wide field-of-view (WFoV) 3D ultrasound from overla
 **Convex probe geometry.** Each ultrasound image is modelled as a fan of scanlines between an inner and an outer radius, with an opening angle Θ of up to 360° (for example, a rotating ICE probe). In 3D mode, one training sample is a stack of D such fan slices, each with its own pose.
 
 <p align="center">
-  <img src="figures/convex_geometry360.png" width="600">
+  <img src="docs/convex_geometry360.png" width="600">
 </p>
 
 **Cone tracing with multivariate Gaussians.** Every scanline is cast as a cone, and each cone segment is approximated by an anisotropic 3D Gaussian 𝒩(μ, Σ). Its covariance has separate variances along the ray, laterally, and in elevation, which correspond to the three resolution axes of ultrasound. The Gaussians are encoded with integrated positional encoding (IPE), as in mip-NeRF [2].
 
 <p align="center">
-  <img src="figures/mvg_gaussian_estimation_tracing.png" width="800">
+  <img src="docs/mvg_gaussian_estimation_tracing.png" width="800">
 </p>
 
 **Physics-based rendering.** Instead of colour and density, the MLP predicts acoustic properties for every Gaussian: attenuation, reflection and scattering amplitude. As in Ultra-NeRF [1], these maps are combined along each ray into a B-mode intensity, using the energy that remains after attenuation and reflection.
@@ -76,7 +76,7 @@ ultra-wide-nerf/
 │   └── visualize_pose.py            # Plots the poses of a dataset
 ├── configs/                         # Configuration files
 ├── slurm/                           # SLURM and shell job templates
-├── figures/                         # Figures
+├── docs/                            # Figures
 └── data/                            # Place your data here (not included)
 ```
 
