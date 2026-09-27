@@ -1,0 +1,29 @@
+# Data (not released) -- keep only the placeholder
+data/*
+!data/empty.txt
+
+# Experiment outputs, logs and checkpoints
+slurm/Jobs/*
+!slurm/Jobs/empty.txt
+logs/
+*.out
+*.err
+*.tar
+*.pth
+*.ckpt
+events.out.tfevents.*
+
+# Debug visualizations written by --debug_viz_render
+figures/debug_*
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+
+# Editor / OS / tooling
+.DS_Store
+.vscode/
+.idea/
+.specstory/

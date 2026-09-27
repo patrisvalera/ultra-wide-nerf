@@ -1,0 +1,38 @@
+expname = ice
+
+loss = l2
+ssim_filter_size = 7
+
+netwidth = 256
+i_embed = 6
+multires = 10
+
+save_volume = True
+
+dataset_type = us
+convex_n_rays = 250
+convex_n_samples = 600
+convex_center_x = 0
+convex_center_y = 0
+convex_fan_angle = 360
+convex_big_radius = 308.5
+convex_small_radius = 23.3
+convex_use_compiled_cache = False
+convex_use_compiled_cache_on_the_fly = True
+convex_scaling = 3.33
+convex_scaling_y = 0.3
+convex_scaling_x = 0.3
+
+use_convex_mode = True
+use_mip = True
+use_elongation = False
+mip_voxel_radius_lateral = 0.173
+mip_voxel_radius_depth = 0.173
+full_volume_mode = True
+
+# Regularization settings
+reg = True
+r_lcc_penalty = 0.001
+r_tv_penalty = 0.000001
+r_max_reflection = 0.34 
+r_warm_up_it = 1000

@@ -1,0 +1,23 @@
+# To run: conda env create -f environment.yml
+name: ultra-wide-nerf
+channels:
+    - defaults
+    - conda-forge
+    - menpo
+dependencies:
+    - python=3.11.5
+    - pip
+    - pip:
+        - polarTransform
+    - tensorflow=2.12.0
+    - tensorflow-probability=0.14.0
+    - jax=0.4.23
+    - numpy=1.23.5
+    - matplotlib=3.8.4
+    - imageio=2.33.1
+    - imageio-ffmpeg=0.5.1
+    - configargparse=1.4
+    - imagemagick=7.1.0_39
+    - scikit-learn=1.5.1
+    - py-cpuinfo=9.0.0
+    - opencv==4.6.0
