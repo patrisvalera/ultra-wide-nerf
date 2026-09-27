@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ultra-Wide-NeRF: Multivariate Gaussian NeRF for Wide Field-of-View Ultrasound Reconstruction</title>
+  <meta name="description" content="Ultra-Wide-NeRF reconstructs wide field-of-view 3D ultrasound from overlapping convex-probe sweeps with cone tracing and anisotropic multivariate Gaussians. ASMUS Workshop, MICCAI 2026.">
+  <meta property="og:title" content="Ultra-Wide-NeRF">
+  <meta property="og:description" content="Multivariate Gaussian NeRF for Wide Field-of-View Ultrasound Reconstruction. ASMUS Workshop, MICCAI 2026.">
+  <meta property="og:image" content="https://patrisvalera.github.io/ultra-wide-nerf/overview_thesis_method.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    // Missing images become a labelled placeholder so the page never shows a broken icon.
+    function ph(img) {
+      var box = document.createElement('div');
+      box.className = 'ph';
+      box.innerHTML = 'Add <code>' + img.getAttribute('src') + '</code> to the figures folder';
+      img.replaceWith(box);
+    }
+    function phSlider(img) {
+      var s = img.closest('.compare');
+      if (s && !s.classList.contains('missing')) {
+        s.classList.add('missing');
+        var files = Array.prototype.map.call(s.querySelectorAll('img'), function (i) {
+          return '<code>' + i.getAttribute('src') + '</code>';
+        }).join(' and ');
+        s.innerHTML = '<div class="ph">Add ' + files + ' to the figures folder (same view, same size)</div>';
+      }
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d2230;
+      --muted: #5a6172;
+      --rule: #e3e6ec;
+      --wash: #f5f7fa;
+      --accent: #1f4e79;
+      --ours: #eaf1f8;
+      --btn: #2a2e36;
+      --measure: 44rem;
+      --wide: 88rem;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: #fff;
+      color: var(--ink);
+      font-family: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+    code, pre { font-family: "Noto Sans Mono", ui-monospace, Menlo, Consolas, monospace; }
+
+    /* ---------- layout ---------- */
+    .wrap { max-width: var(--wide); margin: 0 auto; padding: 0 1.25rem; }
+    .prose { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+    section { padding: 3.25rem 0; }
+    section.wash { background: var(--wash); }
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 0 0 1.5rem;
+      letter-spacing: -0.01em;
+    }
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2.75rem 0 0.75rem;
+    }
+    p { margin: 0 0 1rem; }
+    .prose p { text-wrap: pretty; }
+    .nowrap { white-space: nowrap; }
+
+    /* ---------- header ---------- */
+    header { padding: 4rem 0 2rem; text-align: center; }
+    .title {
+      font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 0 auto 0.35rem;
+      max-width: 22ch;
+    }
+    .subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      font-weight: 500;
+      color: var(--muted);
+      margin: 0 auto 1.5rem;
+      max-width: 46ch;
+      line-height: 1.35;
+      text-wrap: balance;
+    }
+    .venue {
+      display: inline-block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      border-radius: 999px;
+      padding: 0.2rem 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .authors {
+      font-size: 1.12rem;
+      margin: 0 auto 0.4rem;
+      max-width: 48rem;
+    }
+    .authors span { display: inline-block; margin: 0 0.45rem; white-space: nowrap; }
+    .authors sup, .affil sup { font-size: 0.7em; color: var(--muted); }
+    .affil { font-size: 0.98rem; color: var(--muted); margin: 0 auto; max-width: 48rem; }
+    .affil span { display: inline-block; margin: 0 0.5rem; }
+    .equal { font-size: 0.88rem; color: var(--muted); margin-top: 0.35rem; }
+    .links { margin-top: 1.5rem; display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: var(--btn); color: #fff;
+      padding: 0.5rem 1.15rem; border-radius: 999px;
+      font-size: 0.98rem; font-weight: 500;
+    }
+    .btn:hover { background: #000; text-decoration: none; }
+    .btn svg { width: 1.05em; height: 1.05em; fill: currentColor; }
+
+    /* ---------- figures ---------- */
+    figure { margin: 0; }
+    figcaption {
+      font-size: 0.93rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0.8rem auto 0;
+      max-width: var(--measure);
+      text-align: center;
+      text-wrap: balance;
+    }
+    figcaption b { color: var(--ink); font-weight: 600; }
+    figure img { margin-left: auto; margin-right: auto; }
+    figure a.zoom { display: block; cursor: zoom-in; }
+    .teaser-section { padding-top: 0.5rem; }
+    .teaser img { width: 100%; }
+    .pair > * { min-width: 0; }
+    .pair { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; align-items: center; margin-top: 2.5rem; }
+
+    /* White figures sit on a card on grey sections, so the white reads as intentional */
+    section.wash figure img {
+      background: #fff;
+      padding: clamp(0.5rem, 1.4vw, 1.1rem);
+      border-radius: 10px;
+      box-shadow: 0 0 0 1px var(--rule), 0 2px 10px rgba(16, 24, 40, 0.06);
+    }
+    .results figure { max-width: 64rem; margin: 1.75rem auto 0; }
+    .results .prose h3 { margin-top: 4.5rem; }
+    .ph {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 14rem; padding: 1.5rem;
+      border: 1.5px dashed #b9c0cc; border-radius: 8px;
+      background: repeating-linear-gradient(135deg, #fafbfc 0 12px, #f3f5f8 12px 24px);
+      color: var(--muted); font-size: 0.92rem; text-align: center;
+    }
+    .ph code { word-break: break-all; background: #fff; padding: 0.1rem 0.35rem; border-radius: 4px; margin: 0 0.25rem; font-size: 0.85rem; }
+
+    .video, .results .video { max-width: 46rem; margin-left: auto; margin-right: auto; }
+    .video video {
+      display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; background: #000;
+      border-radius: 10px; box-shadow: 0 2px 14px rgba(16, 24, 40, 0.12);
+    }
+
+    /* ---------- method ---------- */
+    .method-steps { margin-top: 0.5rem; }
+    .method-steps p b { font-weight: 600; }
+
+    /* ---------- results table ---------- */
+    .table-scroll { overflow-x: auto; margin: 0 auto; max-width: 46rem; }
+    table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+    th, td { padding: 0.42rem 0.8rem; text-align: center; }
+    thead th { font-weight: 600; vertical-align: bottom; border-bottom: 1.5px solid var(--ink); line-height: 1.3; }
+    thead th small { display: block; font-weight: 400; color: var(--muted); font-size: 0.8rem; }
+    thead tr:first-child th { border-top: 1.5px solid var(--ink); }
+    table tbody { border-bottom: 1px solid var(--rule); }
+    table tbody:last-child { border-bottom: 1.5px solid var(--ink); }
+    th.cfg { text-align: left; font-weight: 400; color: var(--muted); font-size: 0.88rem; line-height: 1.45; vertical-align: middle; white-space: nowrap; }
+    th.cfg b { color: var(--ink); font-weight: 600; font-size: 0.95rem; }
+    td.metric { text-align: left; color: var(--muted); white-space: nowrap; }
+    .col-ours { background: var(--ours); }
+    td strong { font-weight: 700; }
+
+    /* ---------- comparison slider ---------- */
+    .compare {
+      position: relative; margin: 0 auto; max-width: 100%;
+      user-select: none; -webkit-user-select: none;
+      border-radius: 6px; overflow: hidden; background: #000;
+      --pos: 50%;
+    }
+    .compare.missing { background: none; overflow: visible; }
+    .compare img { width: 100%; }
+    .compare .top {
+      position: absolute; inset: 0;
+      clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+    }
+    .compare .top img { height: 100%; object-fit: cover; }
+    .compare .handle {
+      position: absolute; top: 0; bottom: 0; left: var(--pos);
+      width: 2px; margin-left: -1px; background: #fff; pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+    }
+    .compare .handle::after {
+      content: ""; position: absolute; top: 50%; left: 50%;
+      width: 34px; height: 34px; margin: -17px 0 0 -17px;
+      border-radius: 50%; background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,.35);
+      background-image:
+        linear-gradient(135deg, transparent 45%, var(--ink) 45% 55%, transparent 55%),
+        linear-gradient(45deg, transparent 45%, var(--ink) 45% 55%, transparent 55%);
+    }
+    .compare input[type=range] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      margin: 0; opacity: 0; cursor: ew-resize;
+    }
+    .compare .tag {
+      position: absolute; bottom: 0.7rem; padding: 0.15rem 0.6rem;
+      font-size: 0.82rem; font-weight: 500; color: #fff;
+      background: rgba(20,24,32,.72); border-radius: 4px; pointer-events: none;
+    }
+    .compare .tag.l { left: 0.7rem; }
+    .compare .tag.r { right: 0.7rem; }
+
+    /* ---------- code / bibtex ---------- */
+    pre {
+      background: var(--wash); border: 1px solid var(--rule); border-radius: 6px;
+      padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.55; margin: 0;
+    }
+    section.wash pre { background: #fff; }
+    .bib { position: relative; }
+    .copy {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      font: 500 0.8rem "Noto Sans", sans-serif;
+      background: #fff; color: var(--ink);
+      border: 1px solid var(--rule); border-radius: 4px;
+      padding: 0.25rem 0.6rem; cursor: pointer;
+    }
+    .copy:hover { border-color: var(--muted); }
+
+    footer { padding: 2rem 0 3rem; text-align: center; color: var(--muted); font-size: 0.88rem; }
+
+    @media (max-width: 720px) {
+      body { font-size: 16px; }
+      header { padding-top: 2.75rem; }
+      section { padding: 2.5rem 0; }
+      .pair { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1 class="title">Ultra-Wide-NeRF</h1>
+    <p class="subtitle">Multivariate Gaussian NeRF for Wide <span class="nowrap">Field-of-View</span> Ultrasound Reconstruction</p>
+    <div class="venue">ASMUS Workshop at MICCAI 2026</div>
+
+    <p class="authors">
+      <span><a href="mailto:patris.valera@tum.de">Patris Valera</a><sup>1*</sup></span>
+      <span><a href="mailto:magdalena.wysocki@tum.de">Magdalena Wysocki</a><sup>1,2*</sup></span>
+      <span><a href="mailto:felix.duelmer@tum.de">Felix Duelmer</a><sup>1,2</sup></span>
+      <span><a href="mailto:mf.azampour@tum.de">Mohammad Farid Azampour</a><sup>1,2</sup></span>
+      <span><a href="mailto:sebastian.herz@lumavision.com">Sebastian Herz</a><sup>3</sup></span>
+      <span><a href="mailto:stefan.woerz@lumavision.com">Stefan Wörz</a><sup>3</sup></span>
+      <span><a href="mailto:nassir.navab@tum.de">Nassir Navab</a><sup>1,2</sup></span>
+    </p>
+    <p class="affil">
+      <span><sup>1</sup><a href="https://www.cs.cit.tum.de/camp/start/">CAMP</a>, Technical University of Munich</span>
+      <span><sup>2</sup><a href="https://mcml.ai">Munich Center for Machine Learning</a></span>
+      <span><sup>3</sup><a href="http://www.lumavision.com">LUMA Vision</a>, Dublin</span>
+    </p>
+    <p class="equal">* Equal contribution</p>
+
+    <nav class="links" aria-label="Paper links">
+      <a class="btn" href="https://arxiv.org/pdf/2604.24187">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v1.6H8V13zm0 3.4h8V18H8v-1.6zM8 9.6h3v1.6H8V9.6z"/></svg>
+        Paper
+      </a>
+      <a class="btn" href="https://arxiv.org/abs/2604.24187">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5V3zm8 1.8V9h4.2L13 4.8zM8.3 18.2l2.4-4.2-2.3-4h1.9l1.4 2.6 1.4-2.6h1.9l-2.3 4 2.4 4.2h-1.9l-1.5-2.7-1.5 2.7H8.3z"/></svg>
+        arXiv
+      </a>
+      <a class="btn" href="https://github.com/patrisvalera/ultra-wide-nerf">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        Code
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- Teaser -->
+<section class="teaser-section">
+  <div class="wrap">
+    <figure class="teaser">
+      <a class="zoom" href="overview_thesis_method.png" target="_blank" rel="noopener"><img src="overview_thesis_method.png" alt="Overview of Ultra-Wide-NeRF: overlapping convex-probe sweeps are fused into one continuous neural field and rendered along arbitrary trajectories." onerror="ph(this)"></a>
+      <figcaption><b>Ultra-Wide-NeRF</b> fuses overlapping sweeps of a convex probe into one continuous neural field of the tissue, which we render along arbitrary virtual trajectories for panoramic reconstruction and novel view synthesis.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Abstract -->
+<section class="wash">
+  <div class="wrap">
+    <h2>Abstract</h2>
+    <div class="prose">
+      <p>Wide Field-of-View (WFoV) reconstruction enhances 3D ultrasound imaging by
+      providing valuable anatomical context for segmentation models and visualization.
+      Clinical ultrasound volumes are predominantly acquired using convex probes, which
+      generate expanding, diverging acoustic beams to maximize anatomical coverage.
+      Stitching these sweeps together traditionally introduces significant compounding
+      artifacts and aliasing due to depth-dependent resolution changes. Here, we introduce
+      Ultra-Wide-NeRF, a Multivariate 3D Gaussian (MVG) NeRF-based method for WFoV
+      ultrasound reconstruction. By explicitly modeling the complex beam geometry using
+      distance-dependent convex volumetric sampling and anisotropic 3D Gaussians, our
+      method inherently mitigates these compounding artifacts and provides anti-aliasing.
+      Beyond simply reconstructing a static 3D grid, our NeRF-based approach yields a
+      continuous neural representation of the tissue, enabling the synthesis of
+      high-fidelity novel views from arbitrary virtual trajectories. We validate
+      Ultra-Wide-NeRF for intracardiac echocardiography on phantom and porcine datasets,
+      demonstrating that our method expands the spatial context important in
+      intraoperative navigation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Method -->
+<section>
+  <div class="wrap">
+    <h2>Method</h2>
+    <div class="prose method-steps">
+      <p><b>Convex Probe Geometry.</b> We model each ultrasound image as a fan of scanlines between an inner and an outer radius, with an opening angle of up to 360°, as in a rotating ICE probe. In 3D, one training sample is a stack of fan slices, each with its own pose.</p>
+      <p><b>Cone Tracing with Multivariate Gaussians.</b> Every scanline is cast as a cone, and each cone segment is approximated by a Gaussian 𝒩(μ, Σ). The covariance has separate variances along the ray, laterally and in elevation, matching the three resolution axes of ultrasound. We encode the Gaussians with integrated positional encoding, following mip-NeRF.</p>
+      <p><b>Physics-based Rendering.</b> Instead of colour and density, the network predicts attenuation, reflection and scattering amplitude per Gaussian. As in Ultra-NeRF, these maps are combined along each ray into B-mode intensity, using the energy that remains after attenuation and reflection.</p>
+    </div>
+    <div class="pair">
+      <figure>
+        <a class="zoom" href="convex_geometry360.png" target="_blank" rel="noopener"><img src="convex_geometry360.png" alt="360° convex fan geometry between inner and outer radius." onerror="ph(this)"></a>
+        <figcaption>Convex fan geometry with a 360° opening angle.</figcaption>
+      </figure>
+      <figure>
+        <a class="zoom" href="mvg_gaussian_estimation_tracing.png" target="_blank" rel="noopener"><img src="mvg_gaussian_estimation_tracing.png" alt="Cone tracing: each cone segment approximated by an anisotropic 3D Gaussian." onerror="ph(this)"></a>
+        <figcaption>Each cone segment becomes an anisotropic 3D Gaussian with axial, lateral and elevational variance.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- Results -->
+<section class="wash results" id="results">
+  <div class="wrap">
+    <h2>Results</h2>
+
+    <div class="prose">
+      <h3 style="margin-top:0">3D Reconstruction</h3>
+      <p>The fused volume can be rendered in 3D and cut along any plane. The video shows the reconstruction and its sagittal and coronal cuts with anatomical labels overlaid.</p>
+    </div>
+    <figure class="video">
+      <video src="nerf_3d_video.mp4" poster="nerf_3d_video_poster.jpg" autoplay muted loop playsinline controls preload="metadata" aria-label="Ultra-Wide-NeRF 3D reconstruction with sagittal and coronal cuts"></video>
+      <figcaption><b>Ultra-Wide-NeRF reconstruction</b>: volume rendering, followed by sagittal and coronal cuts with label overlays.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Hold-out Volume Synthesis</h3>
+      <p>We train on N subvolumes, subsampled in depth, and render subvolumes that were never seen during training at full resolution. We compare against Ultra-NeRF with point sampling, trained on single 2D fan slices and on 3D stacks. Ultra-Wide-NeRF suppresses aliasing and lowers blurriness.</p>
+    </div>
+    <figure>
+      <a class="zoom" href="holdout_comparison.png" target="_blank" rel="noopener"><img src="holdout_comparison.png" alt="Held-out subvolume in three cut planes: ground truth, Ultra-NeRF 2D, Ultra-NeRF 3D and Ultra-Wide-NeRF." onerror="ph(this)"></a>
+      <figcaption><b>Held-out subvolumes</b> in three cut planes. Ultra-Wide-NeRF keeps the anatomical detail of the ground truth with sharper edges and less blur than point-sampled 3D. The 2D variant degrades most in elevation, where it has no inter-slice context.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Panoramic rReconstruction</h3>
+      <p>We render sparse sweeps as one continuous panorama along a trajectory and compare it with the full geometry-based compounding. The stitching artifacts are visible in the compounding result.</p>
+    </div>
+    <figure>
+      <a class="zoom" href="panoramic_reconstruction.png" target="_blank" rel="noopener"><img src="panoramic_reconstruction.png" alt="Panoramic reconstruction of sparse sweeps: geometry-based compounding compared with Ultra-Wide-NeRF." onerror="ph(this)"></a>
+      <figcaption><b>Panoramic reconstruction.</b> Compounding leaves stitching artifacts where sweeps overlap. Ultra-Wide-NeRF produces one continuous volume.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Anatomical Label Alignment</h3>
+      <p>We overlay the same anatomical labels on the panoramic reference and on the Ultra-Wide-NeRF reconstruction of the porcine data. The labelled structures line up with the reconstructed anatomy, so fusing the sweeps into one neural field preserves the geometry of the heart.</p>
+    </div>
+    <figure>
+      <a class="zoom" href="porcine_pano_labels.png" target="_blank" rel="noopener"><img src="porcine_pano_labels.png" alt="Anatomical labels overlaid on the panoramic reference (left) and on the Ultra-Wide-NeRF reconstruction (right) of porcine ICE data." onerror="ph(this)"></a>
+      <figcaption><b>In-vivo porcine data.</b> Left: panoramic reference. Right: Ultra-Wide-NeRF. The same label map is overlaid on both.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>Novel View Synthesis</h3>
+      <p>Because the representation is continuous, we can query it at probe poses that were never acquired, including views off the catheter trajectory.</p>
+    </div>
+    <figure>
+      <a class="zoom" href="novel_view_synthesis.png" target="_blank" rel="noopener"><img src="novel_view_synthesis.png" alt="Novel views rendered from virtual probe poses off the acquisition trajectory." onerror="ph(this)"></a>
+      <figcaption><b>Novel views</b> rendered from virtual probe poses off the acquisition trajectory.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Code -->
+<section>
+  <div class="wrap prose">
+    <h2>Code</h2>
+    <p>Training, evaluation, panoramic trajectory computation and depth-subsampled rendering are available on <a href="https://github.com/patrisvalera/ultra-wide-nerf">GitHub</a> under the Apache 2.0 license. The phantom and porcine data cannot be shared; the repository documents the expected data format.</p>
+    <pre><code>git clone https://github.com/patrisvalera/ultra-wide-nerf.git
+cd ultra-wide-nerf
+conda create -n ultra_wide_nerf python=3.11 &amp;&amp; conda activate ultra_wide_nerf
+pip install -r requirements.txt
+python run_ultranerf.py --config configs/config_convex.txt --datadir data/my_dataset</code></pre>
+  </div>
+</section>
+
+<!-- BibTeX -->
+<section class="wash">
+  <div class="wrap prose">
+    <h2>BibTeX</h2>
+    <div class="bib">
+      <button class="copy" type="button" id="copyBib">Copy</button>
+      <pre><code id="bibtex">@article{valera2026ultrawidenerf,
+  title   = {Multivariate Gaussian NeRF for Wide Field-of-View Ultrasound Reconstruction},
+  author  = {Valera, Patris and Wysocki, Magdalena and Duelmer, Felix and Azampour, Mohammad Farid and Herz, Sebastian and W{\"o}rz, Stefan and Navab, Nassir},
+  journal = {arXiv preprint arXiv:2604.24187},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- Acknowledgements -->
+<section>
+  <div class="wrap prose">
+    <h2>Acknowledgements</h2>
+    <p>This work builds on <a href="https://arxiv.org/abs/2301.10520">Ultra-NeRF</a> and the integrated positional encoding of <a href="https://arxiv.org/abs/2103.13415">mip-NeRF</a>. We thank the <a href="https://www.cs.cit.tum.de/en/camp/labs-locations/ifl-lab/">Interdisciplinary Research Laboratory of CAMP</a> and <a href="https://www.lumavision.com">LUMA Vision</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Chair for Computer Aided Medical Procedures, Technical University of Munich, 2026</div>
+</footer>
+
+<script>
+  // Comparison slider
+  (function () {
+    var c = document.getElementById('compare');
+    if (!c) return;
+    var r = c.querySelector('input[type=range]');
+    if (!r) return;
+    var set = function () { c.style.setProperty('--pos', r.value + '%'); };
+    r.addEventListener('input', set);
+    set();
+  })();
+
+  // Copy BibTeX
+  (function () {
+    var b = document.getElementById('copyBib');
+    var t = document.getElementById('bibtex');
+    b.addEventListener('click', function () {
+      var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(t.textContent).then(done, function () { b.textContent = 'Select and copy'; });
+      } else {
+        var range = document.createRange(); range.selectNodeContents(t);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(range);
+        b.textContent = 'Press Ctrl+C';
+      }
+    });
+  })();
+</script>
+</body>
+</html>

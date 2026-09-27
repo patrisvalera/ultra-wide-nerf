@@ -4,7 +4,7 @@
 
 **Accepted at the ASMUS Workshop, MICCAI 2026**
 
-<a href="mailto:patris.valera@tum.de">Patris Valera</a><sup>1</sup><sup>⋆</sup>, <a href="mailto:magdalena.wysocki@tum.de">Magdalena Wysocki</a><sup>1</sup><sup>⋆</sup>, <a href="mailto:felix.duelmer@tum.de">Felix Duelmer</a><sup>1,2</sup>, <a href="mailto:mf.azampour@tum.de">Mohammad Farid Azampour</a><sup>1,2</sup>, <a href="mailto:sebastian.herz@lumavision.com">Sebastian Herz</a><sup>3</sup>, <a href="mailto:stefan.woerz@lumavision.com">Stefan Wörz</a><sup>3</sup>, <a href="mailto:nassir.navab@tum.de">Nassir Navab</a><sup>1,2</sup>
+<a href="mailto:patris.valera@tum.de">Patris Valera</a><sup>1</sup><sup>⋆</sup>, <a href="mailto:magdalena.wysocki@tum.de">Magdalena Wysocki</a><sup>1,2</sup><sup>⋆</sup>, <a href="mailto:felix.duelmer@tum.de">Felix Duelmer</a><sup>1,2</sup>, <a href="mailto:mf.azampour@tum.de">Mohammad Farid Azampour</a><sup>1,2</sup>, <a href="mailto:sebastian.herz@lumavision.com">Sebastian Herz</a><sup>3</sup>, <a href="mailto:stefan.woerz@lumavision.com">Stefan Wörz</a><sup>3</sup>, <a href="mailto:nassir.navab@tum.de">Nassir Navab</a><sup>1,2</sup>
 
 <sup>1</sup> Chair for Computer Aided Medical Procedures (<a href="https://www.cs.cit.tum.de/camp/start/">CAMP</a>), Technical University of Munich, Germany<br>
 <sup>2</sup> Munich Center for Machine Learning (<a href="https://mcml.ai">MCML</a>), Munich, Germany<br>
