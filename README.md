@@ -2,6 +2,14 @@
 
 # Ultra-Wide-NeRF: Multivariate Gaussian NeRF for Wide Field-of-View Ultrasound Reconstruction
 
+<table align="center">
+  <tr>
+    <td align="center" bgcolor="#947b2c">
+      🏆 <strong>Won Best Paper</strong> at the ASMUS Workshop, MICCAI 2026
+    </td>
+  </tr>
+</table>
+
 **Accepted at the ASMUS Workshop, MICCAI 2026**
 
 <a href="mailto:patris.valera@tum.de">Patris Valera</a><sup>1</sup><sup>⋆</sup>, <a href="mailto:magdalena.wysocki@tum.de">Magdalena Wysocki</a><sup>1,2</sup><sup>⋆</sup>, <a href="mailto:felix.duelmer@tum.de">Felix Duelmer</a><sup>1,2</sup>, <a href="mailto:mf.azampour@tum.de">Mohammad Farid Azampour</a><sup>1,2</sup>, <a href="mailto:sebastian.herz@lumavision.com">Sebastian Herz</a><sup>3</sup>, <a href="mailto:stefan.woerz@lumavision.com">Stefan Wörz</a><sup>3</sup>, <a href="mailto:nassir.navab@tum.de">Nassir Navab</a><sup>1,2</sup>
@@ -11,7 +19,7 @@
 <sup>3</sup> <a href="http://www.lumavision.com">LUMA Vision</a>, Dublin, Ireland<br>
 <sup>⋆</sup> Equal contribution
 
-[📄 Paper (arXiv)](https://arxiv.org/abs/2604.24187)
+[📄 Paper (arXiv)](https://arxiv.org/abs/2604.24187)  |  [🌐 Project Page](https://patrisvalera.github.io/ultra-wide-nerf/) 
 
 </div>
 
